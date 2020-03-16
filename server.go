@@ -9,39 +9,39 @@ import (
 )
 
 type Server struct {
-	index string
+	handler Handler
 }
 
-func (s *Server) ServeError(err error) {
-	log.Print(err)
-
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Error occured: %q", err)
-	})
-
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+func (s *Server) Serve(f func(h Handler) http.HandlerFunc) {
+	if err := http.ListenAndServe(":8080", f(s.handler)); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (s *Server) ServePods(pods *Pods) {
-	html, err := ioutil.ReadFile(s.index)
+type Handler struct {
+	index string
+}
+
+func (h *Handler) ServeError(err error) http.HandlerFunc {
+	log.Print(err)
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Error occured: %q", err)
+	}
+}
+
+func (h *Handler) ServePods(pods *Pods) http.HandlerFunc {
+	html, err := ioutil.ReadFile(h.index)
 	if err != nil {
-		s.ServeError(err)
-		return
+		return h.ServeError(err)
 	}
 
 	tpl, err := template.New("todos").Parse(string(html))
 	if err != nil {
-		s.ServeError(err)
-		return
+		return h.ServeError(err)
 	}
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		tpl.Execute(w, pods)
-	})
-
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal(err)
 	}
 }
