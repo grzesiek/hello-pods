@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	v1 "k8s.io/api/core/v1"
 )
 
 type Server struct {
@@ -30,13 +32,13 @@ func (h *Handler) ServeError(err error) http.HandlerFunc {
 	}
 }
 
-func (h *Handler) ServePods(pods *Pods) http.HandlerFunc {
+func (h *Handler) ServePods(pods []v1.Pod) http.HandlerFunc {
 	html, err := ioutil.ReadFile(h.index)
 	if err != nil {
 		return h.ServeError(err)
 	}
 
-	tpl, err := template.New("todos").Parse(string(html))
+	tpl, err := template.New("pods").Parse(string(html))
 	if err != nil {
 		return h.ServeError(err)
 	}

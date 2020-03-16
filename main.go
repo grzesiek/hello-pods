@@ -21,6 +21,11 @@ func main() {
 			return handler.ServeError(err)
 		}
 
-		return handler.ServePods(&Pods{client: clientset, namespace: "default"})
+		pods, err := Pods{client: clientset, namespace: "default"}.List()
+		if err != nil {
+			return handler.ServeError(err)
+		}
+
+		return handler.ServePods(pods)
 	})
 }
