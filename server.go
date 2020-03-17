@@ -14,8 +14,12 @@ type Server struct {
 	handler Handler
 }
 
-func (s *Server) Serve(f func(h Handler) http.HandlerFunc) {
-	if err := http.ListenAndServe(":8080", f(s.handler)); err != nil {
+func (s *Server) Serve(handle func(h Handler) http.HandlerFunc) {
+	err := http.ListenAndServe(":8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		handle(s.handler)(w, r)
+	}))
+
+	if err != nil {
 		log.Fatal(err)
 	}
 }
