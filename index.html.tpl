@@ -18,7 +18,7 @@
             {{ range . }}
               <tr>
                   <td class="border p-5">{{ .Name }}</td>
-                  <td class="border p-5">{{ .Status }}</td>
+                  <td class="border p-5">{{ .Status.Phase }}</td>
               </tr>
             {{ end }}
           </table>
