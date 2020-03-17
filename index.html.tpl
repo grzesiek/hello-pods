@@ -17,8 +17,8 @@
           <table class="table-auto">
             {{ range . }}
               <tr>
-                  <td class="border p-5">{{ .ObjectMeta.Name }}</td>
-                  <td class="border p-5">{{ .Status.Message }}</td>
+                  <td class="border p-5">{{ .Name }}</td>
+                  <td class="border p-5">{{ .Status }}</td>
               </tr>
             {{ end }}
           </table>
